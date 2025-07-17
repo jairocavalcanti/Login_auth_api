@@ -19,20 +19,23 @@ public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
     
-    // Metodo String destinado á criação do token referente ao usuario passado como argumento
+
     // String method that creates a token for the user passed in the arguments.
     public String generateToken(User user) {
         try {
-            // Cria o algoritmo de assinatura HMAC com a chave secreta
+
             // Creating signed algorithm HMAC with secret key 
             Algorithm algorithm = Algorithm.HMAC256(secret);
 
-            // Criando token JWT 
+
             // Creating JWT token
             String token = JWT.create()
+                // token issuer identification
                 .withIssuer("login-auth-api")
+                // token unique identifier
                 .withSubject(user.getEmail())
                 .withExpiresAt(this.generateExpirationDate())
+                // finally apply the digital signature with the secret key and algorithm
                 .sign(algorithm);
             return token;
         } catch (JWTCreationException exception){
