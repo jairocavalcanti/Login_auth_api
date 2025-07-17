@@ -42,16 +42,18 @@ public class TokenService {
             throw new RuntimeException("Error while authenticating");
         }
     }
-
+        //Validating token
     public String validateToken(String token){
        try {
         Algorithm algorithm = Algorithm.HMAC256(secret);
+            //token verification
             return JWT.require(algorithm)
                    .withIssuer("login auth api")
                    .build()
                    .verify(token)
                    .getSubject();
-       } catch (JWTCreationException e) {
+            //JWT exception for token
+       } catch (JWTCreationException exception) {
           return null;
        } 
     }
