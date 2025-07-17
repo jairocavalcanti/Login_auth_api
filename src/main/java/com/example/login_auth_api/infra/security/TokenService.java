@@ -59,9 +59,13 @@ public class TokenService {
         }
     }
 
+    // private method made to generate an expiration date to token 
     private Instant generateExpirationDate() {
+        // LocalDateTime.now: returns the actual local date and time 
         return LocalDateTime.now()
+                 // plusHours: adding 2 hours to expirationDate
                 .plusHours(2)
+                // toInstant: chosing the zone of "local" date and time
                 .toInstant(ZoneOffset.of("-3"));
     }
 }
