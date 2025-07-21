@@ -28,7 +28,40 @@ public class SecurityFilter extends OncePerRequestFilter {
     UserRepository userRepository;
 
     @Override
-    // metodo abstrato da classe OncePerRequestFilter
+    // abstract obrigatory method from oncePerRequestFilter
+    //HTTP ServletRequest: incoming request from the client
+    //HTTP ServletResponse: send the response back to client
+    //Filter Chain: send the request and response to controller
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+
+        String path = request.getRequestURI();
+
+        if (path.startsWith("/auth") || path.equals("/user")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        String token = recoverToken(request);
+
+        if (token != null) {
+            String login = tokenService.validateToken(token);
+
+            if (login != null) {
+                User user = userRepository.findByEmail(login)
+                        .orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
+
+                var authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+                var authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        }
+
+        filterChain.doFilter(request, response);
+    }
+
+    /*
+    @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
                 
@@ -47,7 +80,8 @@ public class SecurityFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
-
+    */
+   
     private String recoverToken(HttpServletRequest request) {
         // Campo referente ao valor "Authorization" é equivalente ao valor do token
         // criado pelo metodo generate token
