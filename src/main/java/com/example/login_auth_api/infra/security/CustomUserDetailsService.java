@@ -6,10 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Component;
 
 import com.example.login_auth_api.domainuser.User;
 import com.example.login_auth_api.repositories.UserRepository;
 
+@Component
 // CustomUserDetailsService implementing UserDetailsService interface
 public class CustomUserDetailsService implements UserDetailsService {
 
@@ -20,7 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {   
        // User returned by query "findbyemail" in user repository
        User user = this.repository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-       // returning object UserDetails with user permissions and credentials and a role list
+       // returning object UserDetails with user permissions , credentials and a role list
        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), new ArrayList<>());
     }
     
