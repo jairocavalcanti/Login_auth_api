@@ -46,13 +46,13 @@ public class AuthController {
     public ResponseEntity<ResponseDTO> register(@RequestBody RegisterRequestDTO body) {
         Optional<User> user = this.repository.findByEmail(body.email());
         if (user.isEmpty()) {
-            User newuser = new User();
-            newuser.setPassword(passwordEncoder.encode(body.password()));
-            newuser.setEmail(body.email());
-            newuser.setName(body.name());
-            this.repository.save(newuser);
-            String token = this.tokenService.generateToken(newuser);
-            return ResponseEntity.ok(new ResponseDTO(newuser.getName(), token));
+            User newUser = new User();
+            newUser.setPassword(passwordEncoder.encode(body.password()));
+            newUser.setEmail(body.email());
+            newUser.setName(body.name());
+            this.repository.save(newUser);
+            String token = this.tokenService.generateToken(newUser);
+            return ResponseEntity.ok(new ResponseDTO(newUser.getName(), token));
         }
 
         return ResponseEntity.badRequest().build();
