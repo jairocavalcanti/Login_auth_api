@@ -2,6 +2,9 @@ package com.example.login_auth_api.Controllers;
 
 import java.util.Optional;
 
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties.Http;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.login_auth_api.DTO.ErrorResponseDTO;
 import com.example.login_auth_api.DTO.LoginRequestDTO;
 import com.example.login_auth_api.DTO.RegisterRequestDTO;
 import com.example.login_auth_api.DTO.ResponseDTO;
@@ -30,13 +34,14 @@ public class AuthController {
     private final TokenService tokenService;
 
     @PostMapping("/login")
-    public ResponseEntity<ResponseDTO> login(@RequestBody LoginRequestDTO body) {
+    // ? - generic type (classes, records , lists ...)
+    public ResponseEntity<?> login(@RequestBody LoginRequestDTO body) {
         User user = this.repository.findByEmail(body.email()).orElseThrow(() -> new RuntimeException("User not found"));
         if (passwordEncoder.matches(body.password(), user.getPassword())) {
             String token = this.tokenService.generateToken(user);
             return ResponseEntity.ok(new ResponseDTO(user.getName(), token));
         }
-        return ResponseEntity.badRequest().build();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponseDTO("unauthorized"));
     }
 
     @PostMapping("/register")
